@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.iba.server</groupId>
+	<artifactId>eureka-center-server</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<name>eureka-center-server</name>
+	<description>统一服务注册中心</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+        <spring-boot.version>1.5.9.RELEASE</spring-boot.version>
+        <spring-boot-maven-plugin.version>1.5.9.RELEASE</spring-boot-maven-plugin.version>
+        <spring-cloud.version>Edgware.RELEASE</spring-cloud.version>
+        <maven.test.skip>true</maven.test.skip>
+
+        <docker.plugin.version>1.0.0</docker.plugin.version>
+        <dockerfile.compiled.position>${project.build.directory}/docker</dockerfile.compiled.position>
+        <docker.registry.name>discover-server</docker.registry.name>
+        <docker.registry.url>192.168.6.113:8888</docker.registry.url>
+        <docker.skip.build>false</docker.skip.build>
+        <docker.push.image>true</docker.push.image>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-eureka-server</artifactId>
+		</dependency>
+	</dependencies>
+
+    <build>
+        <!-- 使用@@站位符，输出Dockerfile至docker文件夹 -->
+        <resources>
+            <resource>
+                <directory>src/main/docker</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/Dockerfile</include>
+                </includes>
+                <targetPath>../docker</targetPath>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- 集成Docker maven 插件 -->
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>${docker.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>push-image</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>push</goal>
+                        </goals>
+                        <configuration>
+                            <imageName>${docker.registry.url}/${docker.registry.name}/${project.artifactId}:latest</imageName>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!--配置变量，包括是否build、imageName、imageTag，非常灵活-->
+                    <skipDocker>${docker.skip.build}</skipDocker>
+                    <!--最后镜像产生了两个tag，版本和和最新的-->
+                    <forceTags>true</forceTags>
+                    <imageTags>
+                        <imageTag>${project.version}</imageTag>
+                        <imageTag>latest</imageTag>
+                    </imageTags>
+                    <!--install阶段也上传，否则只有deploy阶段上传-->
+                    <pushImage>${docker.push.image}</pushImage>
+                    <!--时区配置-->
+                    <env>
+                        <TZ>Asia/Shanghai</TZ>
+                    </env>
+                    <runs>
+                        <run>ln -snf /usr/share/zoneinfo/$TZ /etc/localtime</run>
+                        <run>echo $TZ > /etc/timezone</run>
+                        <run>wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh</run>
+                        <run>chmod 777 wait-for-it.sh</run>
+                    </runs>
+                    <!-- 配置镜像名称，遵循Docker的命名规范： springio/image -->
+                    <imageName>${docker.registry.url}/${docker.registry.name}/${project.artifactId}</imageName>
+                    <!-- Dockerfile位置，由于配置了编译时动态获取Maven变量，真正的Dockerfile位于位于编译后位置 -->
+                    <dockerDirectory>${dockerfile.compiled.position}</dockerDirectory>
+                    <resources>
+                        <!-- 构建时需要的资源文件，这些文件和Dockerfile放在一起，这里只需要Spring Boot生成的jar文件即可 -->
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                    <!--push到私有的hub-->
+                    <serverId>docker-registry</serverId>
+                    <registryUrl>192.168.6.113:8888</registryUrl>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <distributionManagement>
+        <repository>
+            <id>nexus-releases</id>
+            <name>Nexus Release Repository</name>
+            <url>http://192.168.0.200:8081/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <name>Nexus Snapshot Repository</name>
+            <url>http://192.168.0.200:8081/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+</project>
