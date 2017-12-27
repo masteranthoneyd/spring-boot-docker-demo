@@ -1,0 +1,21 @@
+version: '3'
+services:
+  eureka1:
+    image: 192.168.6.113:8888/discover-server/eureka-center-server
+    ports:
+      - "5001:5001"
+    environment:
+      - ACTIVE=peer1
+    network_mode: "host"
+  eureka2:
+    image: 192.168.6.113:8888/discover-server/eureka-center-server
+    ports:
+      - "5002:5002"
+    environment:
+      - ACTIVE=peer2
+    network_mode: "host"
+#networks:
+#  eureka-net:
+#    driver: overlay
+
+
