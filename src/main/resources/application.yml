@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: eureka-center-server
+  output:
+    ansi:
+      enabled: always
+#  profiles:
+#    active: eurekaService1
+security:
+  basic:
+    enabled: true     # 开启基于HTTP basic的认证
+  user:
+    name: admin
+    password: admin123
+---
+spring:
+  profiles: docker1
+server:
+  port: 5001
+eureka:
+  instance:
+    hostname: docker-eureka1
+    prefer-ip-address: true
+    instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
+  client:
+    serviceUrl:
+      defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST}
+  server:
+    enable-self-preservation: false
+---
+spring:
+  profiles: docker2
+server:
+  port: 5002
+eureka:
+  instance:
+    hostname: docker-eureka2
+    prefer-ip-address: true
+    instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
+  client:
+    serviceUrl:
+      defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST}
+  server:
+    enable-self-preservation: false
+---
+spring:
+  profiles: docker3
+server:
+  port: 5003
+eureka:
+  instance:
+    hostname: docker-eureka3
+    prefer-ip-address: true
+    instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
+  client:
+    serviceUrl:
+      defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST}
+  server:
+    enable-self-preservation: false

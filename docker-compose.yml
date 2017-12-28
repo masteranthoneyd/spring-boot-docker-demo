@@ -1,21 +1,45 @@
 version: '3'
 services:
-  eureka1:
+  docker-eureka1:
     image: 192.168.6.113:8888/discover-server/eureka-center-server
     ports:
       - "5001:5001"
     environment:
-      - ACTIVE=peer1
-    network_mode: "host"
-  eureka2:
+      - ACTIVE=docker1
+      - ADDITIONAL_EUREKA_SERVER_LIST=http://admin:admin123@docker-eureka2:5002/eureka/,http://admin:admin123@docker-eureka3:5003/eureka/
+    networks:
+      eureka-net:
+        aliases:
+          - eureka
+
+  docker-eureka2:
     image: 192.168.6.113:8888/discover-server/eureka-center-server
     ports:
       - "5002:5002"
     environment:
-      - ACTIVE=peer2
-    network_mode: "host"
-#networks:
-#  eureka-net:
-#    driver: overlay
+      - ACTIVE=docker2
+      - ADDITIONAL_EUREKA_SERVER_LIST=http://admin:admin123@docker-eureka1:5001/eureka/,http://admin:admin123@docker-eureka3:5003/eureka/
+    networks:
+      eureka-net:
+        aliases:
+          - eureka
+
+  docker-eureka3:
+    image: 192.168.6.113:8888/discover-server/eureka-center-server
+    ports:
+      - "5003:5003"
+    environment:
+      - ACTIVE=docker3
+      - ADDITIONAL_EUREKA_SERVER_LIST=http://admin:admin123@docker-eureka2:5002/eureka/,http://admin:admin123@docker-eureka1:5001/eureka/
+    networks:
+      eureka-net:
+        aliases:
+          - eureka
+
+# docker network create -d=overlay --attachable eureka-net
+networks:
+  eureka-net:
+    external:
+      name: eureka-net
 
 

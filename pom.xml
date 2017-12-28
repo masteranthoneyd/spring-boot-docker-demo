@@ -25,7 +25,7 @@
         <docker.registry.name>discover-server</docker.registry.name>
         <docker.registry.url>192.168.6.113:8888</docker.registry.url>
         <docker.skip.build>false</docker.skip.build>
-        <docker.push.image>true</docker.push.image>
+        <docker.push.image>false</docker.push.image>
     </properties>
 
     <dependencyManagement>
@@ -52,6 +52,11 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-eureka-server</artifactId>
 		</dependency>
+        <!--配置需要认证的eureka所需要引用的包-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
 	</dependencies>
 
     <build>
@@ -94,7 +99,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <!-- 集成Docker maven 插件 -->
             <plugin>
                 <groupId>com.spotify</groupId>
@@ -129,16 +133,6 @@
                     </imageTags>
                     <!--install阶段也上传，否则只有deploy阶段上传-->
                     <pushImage>${docker.push.image}</pushImage>
-                    <!--时区配置-->
-                    <env>
-                        <TZ>Asia/Shanghai</TZ>
-                    </env>
-                    <runs>
-                        <run>ln -snf /usr/share/zoneinfo/$TZ /etc/localtime</run>
-                        <run>echo $TZ > /etc/timezone</run>
-                        <run>wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh</run>
-                        <run>chmod 777 wait-for-it.sh</run>
-                    </runs>
                     <!-- 配置镜像名称，遵循Docker的命名规范： springio/image -->
                     <imageName>${docker.registry.url}/${docker.registry.name}/${project.artifactId}</imageName>
                     <!-- Dockerfile位置，由于配置了编译时动态获取Maven变量，真正的Dockerfile位于位于编译后位置 -->
