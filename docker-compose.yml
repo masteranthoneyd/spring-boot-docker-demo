@@ -6,7 +6,16 @@ services:
       - "5001:5001"
     environment:
       - ACTIVE=docker1
+      - PORT=5001
       - ADDITIONAL_EUREKA_SERVER_LIST=http://admin:admin123@docker-eureka2:5002/eureka/,http://admin:admin123@docker-eureka3:5003/eureka/
+    deploy:
+      mode: global
+#      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+        max_attempts: 3
+        window: 10s
     networks:
       eureka-net:
         aliases:
@@ -18,7 +27,16 @@ services:
       - "5002:5002"
     environment:
       - ACTIVE=docker2
+      - PORT=5002
       - ADDITIONAL_EUREKA_SERVER_LIST=http://admin:admin123@docker-eureka1:5001/eureka/,http://admin:admin123@docker-eureka3:5003/eureka/
+    deploy:
+      mode: global
+#      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+        max_attempts: 3
+        window: 10s
     networks:
       eureka-net:
         aliases:
@@ -30,7 +48,16 @@ services:
       - "5003:5003"
     environment:
       - ACTIVE=docker3
+      - PORT=5003
       - ADDITIONAL_EUREKA_SERVER_LIST=http://admin:admin123@docker-eureka2:5002/eureka/,http://admin:admin123@docker-eureka1:5001/eureka/
+    deploy:
+      mode: global
+#      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+        max_attempts: 3
+        window: 10s
     networks:
       eureka-net:
         aliases:
@@ -41,5 +68,3 @@ networks:
   eureka-net:
     external:
       name: eureka-net
-
-

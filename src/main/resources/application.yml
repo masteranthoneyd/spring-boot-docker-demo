@@ -4,8 +4,6 @@ spring:
   output:
     ansi:
       enabled: always
-#  profiles:
-#    active: eurekaService1
 security:
   basic:
     enabled: true     # 开启基于HTTP basic的认证
@@ -15,11 +13,15 @@ security:
 ---
 spring:
   profiles: docker1
+  cloud:
+    inetutils:
+      preferred-networks: 10.0.3
 server:
-  port: 5001
+  port: ${PORT}
 eureka:
   instance:
     hostname: docker-eureka1
+    leaseRenewalIntervalInSeconds: 15
     prefer-ip-address: true
     instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
   client:
@@ -30,11 +32,15 @@ eureka:
 ---
 spring:
   profiles: docker2
+  cloud:
+    inetutils:
+      preferred-networks: 10.0.3
 server:
-  port: 5002
+  port: ${PORT}
 eureka:
   instance:
     hostname: docker-eureka2
+    leaseRenewalIntervalInSeconds: 15
     prefer-ip-address: true
     instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
   client:
@@ -45,11 +51,15 @@ eureka:
 ---
 spring:
   profiles: docker3
+  cloud:
+    inetutils:
+      preferred-networks: 10.0.3
 server:
-  port: 5003
+  port: ${PORT}
 eureka:
   instance:
     hostname: docker-eureka3
+    leaseRenewalIntervalInSeconds: 15
     prefer-ip-address: true
     instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
   client:
