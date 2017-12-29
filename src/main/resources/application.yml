@@ -1,6 +1,9 @@
 spring:
   application:
     name: eureka-center-server
+  cloud:
+    inetutils:
+      preferred-networks: ${PREFERRED_NETWORKS}
   output:
     ansi:
       enabled: always
@@ -8,14 +11,11 @@ security:
   basic:
     enabled: true     # 开启基于HTTP basic的认证
   user:
-    name: admin
-    password: admin123
+    name: ${SECURITY_NAME}
+    password: ${SECURITY_PASSWORD}
 ---
 spring:
   profiles: docker1
-  cloud:
-    inetutils:
-      preferred-networks: 10.0.3
 server:
   port: ${PORT}
 eureka:
@@ -32,9 +32,6 @@ eureka:
 ---
 spring:
   profiles: docker2
-  cloud:
-    inetutils:
-      preferred-networks: 10.0.3
 server:
   port: ${PORT}
 eureka:
@@ -51,9 +48,6 @@ eureka:
 ---
 spring:
   profiles: docker3
-  cloud:
-    inetutils:
-      preferred-networks: 10.0.3
 server:
   port: ${PORT}
 eureka:

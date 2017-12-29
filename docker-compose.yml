@@ -1,16 +1,18 @@
 version: '3'
 services:
   docker-eureka1:
-    image: 192.168.6.113:8888/discover-server/eureka-center-server
-    ports:
-      - "5001:5001"
+    image: ${IMAGE}
+    env_file:
+      - .env
     environment:
       - ACTIVE=docker1
-      - PORT=5001
-      - ADDITIONAL_EUREKA_SERVER_LIST=http://admin:admin123@docker-eureka2:5002/eureka/,http://admin:admin123@docker-eureka3:5003/eureka/
+      - PORT=${EUREKA1_PORT}
+      - ADDITIONAL_EUREKA_SERVER_LIST=http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka2:${EUREKA2_PORT}/eureka/,http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka3:${EUREKA3_PORT}/eureka/
+    ports:
+      - ${EUREKA1_PORT}:${EUREKA1_PORT}
     deploy:
-      mode: global
-#      replicas: 1
+      mode: replicated
+      replicas: 1
       restart_policy:
         condition: on-failure
         delay: 3s
@@ -22,16 +24,18 @@ services:
           - eureka
 
   docker-eureka2:
-    image: 192.168.6.113:8888/discover-server/eureka-center-server
-    ports:
-      - "5002:5002"
+    image: ${IMAGE}
+    env_file:
+      - .env
     environment:
       - ACTIVE=docker2
-      - PORT=5002
-      - ADDITIONAL_EUREKA_SERVER_LIST=http://admin:admin123@docker-eureka1:5001/eureka/,http://admin:admin123@docker-eureka3:5003/eureka/
+      - PORT=${EUREKA2_PORT}
+      - ADDITIONAL_EUREKA_SERVER_LIST=http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka1:${EUREKA1_PORT}/eureka/,http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka3:${EUREKA3_PORT}/eureka/
+    ports:
+      - ${EUREKA2_PORT}:${EUREKA2_PORT}
     deploy:
-      mode: global
-#      replicas: 1
+      mode: replicated
+      replicas: 1
       restart_policy:
         condition: on-failure
         delay: 3s
@@ -43,16 +47,18 @@ services:
           - eureka
 
   docker-eureka3:
-    image: 192.168.6.113:8888/discover-server/eureka-center-server
-    ports:
-      - "5003:5003"
+    image: ${IMAGE}
+    env_file:
+      - .env
     environment:
       - ACTIVE=docker3
-      - PORT=5003
-      - ADDITIONAL_EUREKA_SERVER_LIST=http://admin:admin123@docker-eureka2:5002/eureka/,http://admin:admin123@docker-eureka1:5001/eureka/
+      - PORT=${EUREKA3_PORT}
+      - ADDITIONAL_EUREKA_SERVER_LIST=http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka2:${EUREKA2_PORT}/eureka/,http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka1:${EUREKA1_PORT}/eureka/
+    ports:
+      - ${EUREKA3_PORT}:${EUREKA3_PORT}
     deploy:
-      mode: global
-#      replicas: 1
+      mode: replicated
+      replicas: 1
       restart_policy:
         condition: on-failure
         delay: 3s
@@ -63,8 +69,8 @@ services:
         aliases:
           - eureka
 
-# docker network create -d=overlay --attachable eureka-net
+# docker network create -d=overlay --attachable --subnet 10.0.3.0/24 name
 networks:
   eureka-net:
     external:
-      name: eureka-net
+      name: ${EXTERNAL_NETWORK:-eureka-net}
