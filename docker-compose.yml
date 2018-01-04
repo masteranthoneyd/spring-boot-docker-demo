@@ -69,7 +69,7 @@ services:
         aliases:
           - eureka
 
-# docker network create -d=overlay --attachable --subnet 10.10.0.0/16 name
+# docker network create --opt encrypted -d=overlay --attachable --subnet 10.10.0.0/16 name
 networks:
   eureka-net:
     external:
