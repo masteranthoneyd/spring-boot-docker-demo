@@ -22,6 +22,10 @@ services:
       eureka-net:
         aliases:
           - eureka
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
 
   docker-eureka2:
     image: ${IMAGE}
@@ -45,6 +49,10 @@ services:
       eureka-net:
         aliases:
           - eureka
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
 
   docker-eureka3:
     image: ${IMAGE}
@@ -68,6 +76,10 @@ services:
       eureka-net:
         aliases:
           - eureka
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
 
 # docker network create --opt encrypted -d=overlay --attachable --subnet 10.10.0.0/16 name
 networks:
