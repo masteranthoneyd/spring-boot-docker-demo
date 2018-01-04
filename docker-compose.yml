@@ -1,4 +1,4 @@
-version: '3'
+version: "3.4"
 services:
   docker-eureka1:
     image: ${IMAGE}
@@ -17,15 +17,23 @@ services:
         condition: on-failure
         delay: 3s
         max_attempts: 3
-        window: 10s
+        window: 20s
+      update_config:
+        parallelism: 1
+        delay: 20s
     networks:
       eureka-net:
         aliases:
           - eureka
     logging:
       options:
-        max-size: "10m"
-        max-file: "10"
+        max-size: "1m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:${EUREKA1_PORT}/health/"]
+      interval: 1m30s
+      timeout: 15s
+      retries: 3
 
   docker-eureka2:
     image: ${IMAGE}
@@ -44,15 +52,23 @@ services:
         condition: on-failure
         delay: 3s
         max_attempts: 3
-        window: 10s
+        window: 20s
+      update_config:
+        parallelism: 1
+        delay: 20s
     networks:
       eureka-net:
         aliases:
           - eureka
     logging:
       options:
-        max-size: "10m"
-        max-file: "10"
+        max-size: "1m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:${EUREKA2_PORT}/health/"]
+      interval: 1m30s
+      timeout: 15s
+      retries: 3
 
   docker-eureka3:
     image: ${IMAGE}
@@ -71,18 +87,28 @@ services:
         condition: on-failure
         delay: 3s
         max_attempts: 3
-        window: 10s
+        window: 20s
+      update_config:
+        parallelism: 1
+        delay: 20s
     networks:
       eureka-net:
         aliases:
           - eureka
     logging:
       options:
-        max-size: "10m"
-        max-file: "10"
+        max-size: "1m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:${EUREKA3_PORT}/health/"]
+      interval: 1m30s
+      timeout: 15s
+      retries: 3
 
 # docker network create --opt encrypted -d=overlay --attachable --subnet 10.10.0.0/16 name
 networks:
   eureka-net:
     external:
       name: ${BACKEND_NETWORK:-backend}
+
+
