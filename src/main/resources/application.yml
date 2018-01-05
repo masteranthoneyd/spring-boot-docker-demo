@@ -21,9 +21,10 @@ server:
 eureka:
   instance:
     hostname: docker-eureka1
-    leaseRenewalIntervalInSeconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
-#    prefer-ip-address: true
-    instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
+    prefer-ip-address: true
+    ip-address: ${eureka.instance.hostname}
+    instance-id: ${eureka.instance.hostname}:${spring.cloud.client.ipAddress}:${server.port}
+    lease-renewal-interval-in-seconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
   client:
     serviceUrl:
       defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST}
@@ -37,9 +38,10 @@ server:
 eureka:
   instance:
     hostname: docker-eureka2
-    leaseRenewalIntervalInSeconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
-#    prefer-ip-address: true
-    instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
+    prefer-ip-address: true
+    ip-address: ${eureka.instance.hostname}
+    instance-id: ${eureka.instance.hostname}:${spring.cloud.client.ipAddress}:${server.port}
+    lease-renewal-interval-in-seconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
   client:
     serviceUrl:
       defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST}
@@ -53,9 +55,10 @@ server:
 eureka:
   instance:
     hostname: docker-eureka3
-    leaseRenewalIntervalInSeconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
-#    prefer-ip-address: true
-    instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
+    prefer-ip-address: true
+    ip-address: ${eureka.instance.hostname}
+    instance-id: ${eureka.instance.hostname}:${spring.cloud.client.ipAddress}:${server.port}
+    lease-renewal-interval-in-seconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
   client:
     serviceUrl:
       defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST}
